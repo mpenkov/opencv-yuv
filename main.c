@@ -35,8 +35,9 @@ main(int argc, char **argv)
     for (; ;)
     {
         ret = YUV_read(&cap);
-        if (ret == EOF)
+        if (ret == YUV_EOF)
         {
+            cvWaitKey(0);
             break;
         }
         else if (ret == YUV_IO_ERROR)
@@ -46,7 +47,7 @@ main(int argc, char **argv)
         }
         cvCvtColor(cap.ycrcb, bgr, CV_YCrCb2BGR);
         cvShowImage(argv[1], bgr);
-        cvWaitKey(20);
+        cvWaitKey(35);
     }
 
     return 0;
