@@ -51,7 +51,7 @@ YUV_read(struct YUV_Capture *cap)
     
     npixels = cap->width*cap->height;
     bytes_read = fread(cap->buf, sizeof(uint8_t), npixels, cap->fin);
-    if (bytes_read == EOF)
+    if (bytes_read == 0)
         return YUV_EOF;
     else if (bytes_read != npixels)
         return YUV_IO_ERROR;
