@@ -26,6 +26,11 @@ main(int argc, char **argv)
         return 1;
     }
     fin = fopen(argv[1], "rb");
+    if (!fin)
+    {
+        fprintf(stderr, "error: unable to open file: %s\n", argv[1]);
+        return 1;
+    }
     ret = YUV_init(fin, width, height, &cap);
     assert(ret == YUV_OK);
 
