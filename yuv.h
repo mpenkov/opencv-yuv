@@ -26,8 +26,6 @@ struct YUV_Capture
     IplImage *cb_half;
     IplImage *cr_half;
     IplImage *ycrcb;
-
-    uint8_t *buf;
 };
 
 enum YUV_ReturnValue

@@ -10,8 +10,6 @@ YUV_init(FILE *fin, size_t w, size_t h, struct YUV_Capture *out)
     out->width = w;
     out->height = h;
 
-    out->buf = malloc(w*h);
-
     out->ycrcb = cvCreateImage(cvSize(w,h), IPL_DEPTH_8U, 3);
     out->y = cvCreateImage(cvSize(w,h), IPL_DEPTH_8U, 1);
     out->cb = cvCreateImage(cvSize(w,h), IPL_DEPTH_8U, 1);
@@ -21,8 +19,6 @@ YUV_init(FILE *fin, size_t w, size_t h, struct YUV_Capture *out)
 
     if 
     (
-       out->buf == NULL
-       ||
        out->ycrcb == NULL
        ||
        out->y == NULL
@@ -50,22 +46,18 @@ YUV_read(struct YUV_Capture *cap)
     size_t npixels;
     
     npixels = cap->width*cap->height;
-    bytes_read = fread(cap->buf, sizeof(uint8_t), npixels, cap->fin);
+    bytes_read = fread(cap->y->imageData, sizeof(uint8_t), npixels, cap->fin);
     if (bytes_read == 0)
         return YUV_EOF;
     else if (bytes_read != npixels)
         return YUV_IO_ERROR;
-    memcpy(cap->y->imageData, cap->buf, bytes_read);
-
-    bytes_read = fread(cap->buf, sizeof(uint8_t), npixels/4, cap->fin);
+    bytes_read = fread(cap->cb_half->imageData, sizeof(uint8_t), npixels/4, cap->fin);
     if (bytes_read != npixels/4)
         return YUV_IO_ERROR;
-    memcpy(cap->cb_half->imageData, cap->buf, bytes_read);
 
-    bytes_read = fread(cap->buf, sizeof(uint8_t), npixels/4, cap->fin);
+    bytes_read = fread(cap->cr_half->imageData, sizeof(uint8_t), npixels/4, cap->fin);
     if (bytes_read != npixels/4)
         return YUV_IO_ERROR;
-    memcpy(cap->cr_half->imageData, cap->buf, bytes_read);
 
     cvResize(cap->cb_half, cap->cb, CV_INTER_CUBIC);
     cvResize(cap->cr_half, cap->cr, CV_INTER_CUBIC);
@@ -80,8 +72,6 @@ YUV_cleanup(struct YUV_Capture *cap)
     if (!cap)
         return;
 
-    if (cap->buf) 
-        free(cap->buf);
     if (cap->ycrcb) 
         free(cap->ycrcb);
     if (cap->y)
